@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RoomieMatch — Find Your Perfect Roommate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e0d;
+  --surface:#1a1917;
+  --surface2:#242220;
+  --surface3:#2e2b28;
+  --border:#3a3733;
+  --border2:#4a4743;
+  --text:#f0ede8;
+  --text2:#a09890;
+  --text3:#6a6460;
+  --accent:#e8c547;
+  --accent2:#c9a830;
+  --accent-dim:#2a2510;
+  --green:#4caf7d;
+  --green-dim:#0f2a1a;
+  --red:#e06060;
+  --red-dim:#2a1010;
+  --blue:#5b9bd5;
+  --blue-dim:#0f1f2a;
+  --purple:#9b7fce;
+  --r:10px;
+  --r2:16px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0}
+.sidebar-logo{padding:28px 24px 24px;border-bottom:1px solid var(--border)}
+.logo-mark{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);letter-spacing:-0.5px}
+.logo-sub{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.sidebar-user{padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-dim);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--accent);flex-shrink:0}
+.user-name{font-size:14px;font-weight:500}
+.user-status{font-size:11px;color:var(--green);margin-top:1px}
+.sidebar-nav{padding:16px 12px;flex:1}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:0 8px;margin-bottom:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:400;color:var(--text2);transition:all 0.15s;margin-bottom:2px;border:1px solid transparent;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent2)30;font-weight:500}
+.nav-icon{font-size:16px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.page{display:none;flex-direction:column;height:100%;animation:fadein 0.2s ease}
+.page.active{display:flex}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-header{padding:32px 36px 0;flex-shrink:0}
+.page-header h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:var(--text);margin-bottom:4px}
+.page-header p{color:var(--text2);font-size:14px}
+.page-body{padding:24px 36px 36px;flex:1}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.card-sm{padding:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+
+/* STAT CARDS */
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.stat-label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.stat-value{font-family:'DM Serif Display',serif;font-size:32px;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.stat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;margin-top:8px}
+.badge-green{background:var(--green-dim);color:var(--green)}
+.badge-red{background:var(--red-dim);color:var(--red)}
+.badge-blue{background:var(--blue-dim);color:var(--blue)}
+.badge-yellow{background:var(--accent-dim);color:var(--accent)}
+.badge-purple{background:#1e1530;color:var(--purple)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit;user-select:none}
+.btn-primary{background:var(--accent);color:#0f0e0d}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:var(--border2)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red-dim)}
+.btn-danger:hover{background:#3a1515;border-color:var(--red)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-green{background:var(--green-dim);color:var(--green);border:1px solid var(--green-dim)}
+.btn-green:hover{background:#1a3d28;border-color:var(--green)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* MATCH CARDS */
+.match-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px;transition:all 0.2s;cursor:pointer}
+.match-card:hover{border-color:var(--border2);background:var(--surface2)}
+.match-card.selected{border-color:var(--accent);background:var(--accent-dim)}
+.match-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.match-avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0}
+.match-info h3{font-size:16px;font-weight:500;margin-bottom:2px}
+.match-info .match-major{font-size:12px;color:var(--text3)}
+.match-score{margin-left:auto;text-align:right}
+.score-ring{font-family:'DM Serif Display',serif;font-size:26px;color:var(--accent)}
+.score-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.match-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tag{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--surface3);color:var(--text2);border:1px solid var(--border)}
+.match-traits{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.trait-row{display:flex;justify-content:space-between;font-size:12px}
+.trait-key{color:var(--text3)}
+.trait-val{color:var(--text);font-weight:500}
+.match-actions{display:flex;gap:8px}
+
+/* PROGRESS BAR */
+.prog-wrap{background:var(--surface3);border-radius:4px;height:6px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:var(--accent);transition:width 0.5s ease}
+.prog-fill.green{background:var(--green)}
+.prog-fill.blue{background:var(--blue)}
+
+/* QUESTIONNAIRE */
+.q-step-bar{display:flex;gap:8px;margin-bottom:28px}
+.q-step{flex:1;height:3px;border-radius:3px;background:var(--surface3)}
+.q-step.done{background:var(--accent)}
+.q-step.active{background:var(--accent);opacity:0.5}
+.q-section{margin-bottom:28px}
+.q-section-title{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.q-item{margin-bottom:20px}
+.q-label{font-size:14px;font-weight:500;margin-bottom:4px}
+.q-hint{font-size:12px;color:var(--text3);margin-bottom:10px}
+.q-slider-wrap{display:flex;align-items:center;gap:12px}
+.q-slider-min,.q-slider-max{font-size:11px;color:var(--text3);white-space:nowrap;min-width:80px}
+.q-slider-max{text-align:right}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:var(--surface3);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+.q-val-display{font-size:13px;font-weight:600;color:var(--accent);min-width:30px;text-align:center}
+.q-select-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.q-chip{padding:8px 14px;border-radius:8px;border:1px solid var(--border);font-size:13px;cursor:pointer;text-align:center;transition:all 0.15s;background:var(--surface2)}
+.q-chip:hover{border-color:var(--border2);background:var(--surface3)}
+.q-chip.selected{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.q-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;padding:12px;resize:vertical;outline:none;min-height:80px}
+.q-textarea:focus{border-color:var(--border2)}
+.q-radio-group{display:flex;flex-direction:column;gap:8px}
+.q-radio{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);cursor:pointer;background:var(--surface2);transition:all 0.15s}
+.q-radio:hover{border-color:var(--border2)}
+.q-radio.selected{background:var(--accent-dim);border-color:var(--accent)}
+.q-radio-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;transition:all 0.15s}
+.q-radio.selected .q-radio-dot{border-color:var(--accent);background:var(--accent)}
+.q-radio-text{font-size:13px}
+.q-nav{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);margin-top:8px}
+.q-step-label{font-size:12px;color:var(--text3)}
+
+/* MESSAGES */
+.messages-layout{display:flex;gap:0;height:calc(100vh - 120px);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.conv-list{width:240px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--surface)}
+.conv-search{padding:12px;border-bottom:1px solid var(--border)}
+.conv-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+.conv-search input::placeholder{color:var(--text3)}
+.conv-search input:focus{border-color:var(--border2)}
+.conv-item{padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s}
+.conv-item:hover{background:var(--surface2)}
+.conv-item.active{background:var(--accent-dim);border-left:2px solid var(--accent)}
+.conv-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.conv-name{font-size:13px;font-weight:500}
+.conv-time{font-size:10px;color:var(--text3)}
+.conv-preview{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.conv-unread{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.chat-area{flex:1;display:flex;flex-direction:column;background:var(--bg)}
+.chat-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface)}
+.chat-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.chat-name{font-size:14px;font-weight:500}
+.chat-online{font-size:11px;color:var(--green)}
+.chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:70%;display:flex;flex-direction:column;gap:3px}
+.msg.me{align-self:flex-end;align-items:flex-end}
+.msg.them{align-self:flex-start;align-items:flex-start}
+.msg-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.msg.me .msg-bubble{background:var(--accent);color:#0f0e0d;border-bottom-right-radius:4px}
+.msg.them .msg-bubble{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg-time{font-size:10px;color:var(--text3)}
+.chat-input-wrap{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--surface)}
+.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:inherit;font-size:13px;outline:none;resize:none;max-height:100px}
+.chat-input:focus{border-color:var(--border2)}
+.chat-input::placeholder{color:var(--text3)}
+.chat-send{padding:10px 16px;background:var(--accent);color:#0f0e0d;border:none;border-radius:10px;cursor:pointer;font-weight:500;font-size:13px;font-family:inherit;transition:background 0.15s}
+.chat-send:hover{background:var(--accent2)}
+
+/* REPORT */
+.report-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
+.compat-ring{width:120px;height:120px;position:relative;flex-shrink:0}
+.compat-ring svg{transform:rotate(-90deg)}
+.compat-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.compat-ring-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent)}
+.compat-ring-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.report-section{margin-bottom:24px}
+.report-section-title{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.compat-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.compat-row-label{font-size:13px;width:140px;flex-shrink:0}
+.compat-row-bar{flex:1}
+.compat-row-score{font-size:12px;font-weight:600;color:var(--text2);min-width:36px;text-align:right}
+.insight-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.insight-box.good{border-left:3px solid var(--green)}
+.insight-box.warn{border-left:3px solid var(--accent)}
+.insight-box.bad{border-left:3px solid var(--red)}
+.insight-title{font-size:12px;font-weight:600;margin-bottom:4px}
+.insight-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.report-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface2);padding:4px;border-radius:10px;width:fit-content}
+.report-tab{padding:7px 16px;border-radius:7px;font-size:13px;cursor:pointer;color:var(--text2);transition:all 0.15s;font-weight:400}
+.report-tab.active{background:var(--surface);color:var(--text);font-weight:500}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty h3{font-size:16px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.empty p{font-size:13px}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:1000}
+.toast{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;animation:slidein 0.25s ease;pointer-events:none}
+.toast.success{border-left:3px solid var(--green)}
+.toast.info{border-left:3px solid var(--blue)}
+@keyframes slidein{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:28px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto}
+.modal h2{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:8px}
+.modal p{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+
+input[type=text],input[type=email]{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-family:inherit;font-size:14px;outline:none;width:100%}
+input[type=text]:focus,input[type=email]:focus{border-color:var(--border2)}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">RoomieMatch</div>
+      <div class="logo-sub">Scholar Housing</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">S</div>
+      <div>
+        <div class="user-name">Sal Rivera</div>
+        <div class="user-status">● Active</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Menu</div>
+      <div class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-icon">⊞</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('matches')">
+        <span class="nav-icon">◈</span> Matches
+        <span class="nav-badge" id="match-badge">4</span>
+      </div>
+      <div class="nav-item" onclick="navigate('questionnaire')">
+        <span class="nav-icon">✎</span> Questionnaire
+      </div>
+      <div class="nav-item" onclick="navigate('messages')">
+        <span class="nav-icon">✉</span> Messages
+        <span class="nav-badge" id="msg-badge">2</span>
+      </div>
+      <div class="nav-item" onclick="navigate('report')">
+        <span class="nav-icon">◎</span> Report
+      </div>
+    </nav>
+    <div class="sidebar-footer">Fall 2025 · SUNY Oneonta</div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ======== DASHBOARD ======== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Good morning, Sal 👋</h1>
+        <p>Here's your roommate matching overview for Fall 2025.</p>
+      </div>
+      <div class="page-body">
+        <!-- Stats Row -->
+        <div class="grid3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-label">Match Score</div>
+            <div class="stat-value">87%</div>
+            <div class="stat-badge badge-green">↑ Top match: Marcus</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Candidates</div>
+            <div class="stat-value">4</div>
+            <div class="stat-badge badge-blue">Profile verified</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Questionnaire</div>
+            <div class="stat-value">2/3</div>
+            <div class="stat-badge badge-yellow">Step 3 remaining</div>
+          </div>
+        </div>
+        <!-- Body Grid -->
+        <div class="grid2" style="gap:20px">
+          <!-- Top Matches Preview -->
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h2 style="font-size:15px;font-weight:500">Top Matches</h2>
+              <button class="btn btn-ghost btn-sm" onclick="navigate('matches')">View all →</button>
+            </div>
+            <div id="dash-matches-list"></div>
+          </div>
+          <!-- Activity + Quick Actions -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <h2 style="font-size:15px;font-weight:500;margin-bottom:14px">Quick Actions</h2>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-primary" style="justify-content:flex-start" onclick="navigate('questionnaire')">✎ &nbsp; Complete Questionnaire</button>
+                <button class="btn btn-ghost" style="justify-content:flex-start" onclick="navigate('matches')">◈ &nbsp; Browse Matches</button>
+                <button class="btn btn-ghost" style="justify-content:flex-start" onclick="navigate('report')">◎ &nbsp; View Compatibility Report</button>
+                <button class="btn btn-ghost" style="justify-content:flex-start" onclick="navigate('messages')">✉ &nbsp; Open Messages</button>
+              </div>
+            </div>
+            <div class="card">
+              <h2 style="font-size:15px;font-weight:500;margin-bottom:14px">Profile Completion</h2>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                    <span style="color:var(--text2)">Overall</span><span class="badge-green" style="border-radius:4px;padding:1px 6px;background:var(--green-dim);color:var(--green)">72%</span>
+                  </div>
+                  <div class="prog-wrap"><div class="prog-fill green" style="width:72%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                    <span style="color:var(--text2)">Questionnaire</span><span>67%</span>
+                  </div>
+                  <div class="prog-wrap"><div class="prog-fill" style="width:67%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                    <span style="color:var(--text2)">Preferences set</span><span>80%</span>
+                  </div>
+                  <div class="prog-wrap"><div class="prog-fill blue" style="width:80%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card" style="margin-top:20px">
+          <h2 style="font-size:15px;font-weight:500;margin-bottom:14px">Recent Activity</h2>
+          <div id="activity-feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== MATCHES ======== -->
+    <div class="page" id="page-matches">
+      <div class="page-header">
+        <h1>Your Matches</h1>
+        <p>Roommate candidates ranked by compatibility with your profile.</p>
+      </div>
+      <div class="page-body">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="filterMatches('all')" id="filter-all">All (4)</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMatches('high')" id="filter-high">High Match (2)</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMatches('contacted')" id="filter-contacted">Contacted (2)</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMatches('saved')" id="filter-saved">Saved (1)</button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text3)">Sort by: <select style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none" onchange="sortMatches(this.value)"><option value="score">Match Score</option><option value="name">Name</option></select></div>
+        </div>
+        <div id="matches-grid" class="grid-auto"></div>
+      </div>
+    </div>
+
+    <!-- ======== QUESTIONNAIRE ======== -->
+    <div class="page" id="page-questionnaire">
+      <div class="page-header">
+        <h1>Lifestyle Questionnaire</h1>
+        <p>Your answers help us find your ideal roommate match. Be honest!</p>
+      </div>
+      <div class="page-body">
+        <div style="max-width:640px">
+          <div class="q-step-bar" id="q-steps">
+            <div class="q-step done"></div>
+            <div class="q-step done"></div>
+            <div class="q-step active"></div>
+          </div>
+          <div id="q-content"></div>
+          <div class="q-nav">
+            <div class="q-step-label" id="q-step-label">Step 3 of 3</div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" onclick="qPrev()" id="q-prev">← Back</button>
+              <button class="btn btn-primary" onclick="qNext()" id="q-next">Continue →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== MESSAGES ======== -->
+    <div class="page" id="page-messages">
+      <div class="page-header">
+        <h1>Messages</h1>
+        <p>Chat with your potential roommates.</p>
+      </div>
+      <div class="page-body" style="padding-bottom:0">
+        <div class="messages-layout">
+          <div class="conv-list">
+            <div class="conv-search">
+              <input type="text" placeholder="Search conversations…" oninput="searchConvs(this.value)"/>
+            </div>
+            <div id="conv-list-items"></div>
+          </div>
+          <div class="chat-area">
+            <div class="chat-header" id="chat-header">
+              <div class="chat-avatar" id="chat-hdr-avatar" style="background:var(--accent-dim);color:var(--accent)">?</div>
+              <div>
+                <div class="chat-name" id="chat-hdr-name">Select a conversation</div>
+                <div class="chat-online" id="chat-hdr-status"></div>
+              </div>
+              <div style="margin-left:auto">
+                <button class="btn btn-ghost btn-sm" onclick="viewProfile()" id="view-profile-btn" style="display:none">View Profile</button>
+              </div>
+            </div>
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="empty">
+                <div class="empty-icon">✉</div>
+                <h3>No conversation selected</h3>
+                <p>Choose someone from the list to start chatting</p>
+              </div>
+            </div>
+            <div class="chat-input-wrap" id="chat-input-area" style="display:none">
+              <textarea class="chat-input" id="chat-input" placeholder="Type a message…" rows="1" onkeydown="handleEnter(event)"></textarea>
+              <button class="chat-send" onclick="sendMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== REPORT ======== -->
+    <div class="page" id="page-report">
+      <div class="page-header">
+        <h1>Compatibility Report</h1>
+        <p>Detailed analysis of your top matches.</p>
+      </div>
+      <div class="page-body">
+        <div class="report-tabs">
+          <div class="report-tab active" onclick="selectReportTab(0,this)">Marcus T.</div>
+          <div class="report-tab" onclick="selectReportTab(1,this)">Priya M.</div>
+          <div class="report-tab" onclick="selectReportTab(2,this)">Jordan K.</div>
+          <div class="report-tab" onclick="selectReportTab(3,this)">Aiden C.</div>
+        </div>
+        <div id="report-content"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="profile-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <h2 id="modal-name">Profile</h2>
+    <p id="modal-bio"></p>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('profile-modal').classList.remove('open')">Close</button>
+      <button class="btn btn-primary" onclick="messageFromModal()">Message →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ==================== DATA ====================
+const sal = {
+  name: 'Sal Rivera',
+  major: 'Computer Science',
+  year: 'Junior',
+  sleep: 6,       // 1=early, 10=late
+  noise: 4,       // 1=silent, 10=loud
+  guests: 3,      // 1=never, 10=always
+  clean: 8,       // 1=messy, 10=clean
+  study: 7,       // 1=casual, 10=intense
+  social: 5,      // 1=introverted, 10=extroverted
+};
+
+const candidates = [
+  {
+    id:1, name:'Marcus Thompson', initials:'MT', color:'#4caf7d', colorDim:'#0f2a1a',
+    major:'Business Admin', year:'Junior', score:87, hometown:'Albany, NY',
+    bio:'Laid-back, organized, and respectful of shared spaces. Big NBA fan, love cooking on weekends. Looking for a chill roommate who keeps common areas clean.',
+    sleep:6, noise:4, guests:3, clean:8, study:6, social:6,
+    tags:['Night owl','Gym-goer','Neat freak','Sports fan'],
+    contact:'marcus.t@email.com', contacted:true, saved:true,
+    messages:[
+      {from:'them',text:"Hey Sal! I saw we matched. Looks like we have a lot in common.",time:'Mon 2:14 PM'},
+      {from:'me',text:"Yeah for sure! I noticed you're also into keeping things clean haha",time:'Mon 2:18 PM'},
+      {from:'them',text:"Exactly. My last roommate was a disaster lol. So what's your sleep schedule like?",time:'Mon 2:20 PM'},
+      {from:'me',text:"Usually up till midnight, sometimes later if I'm coding. You?",time:'Mon 2:22 PM'},
+      {from:'them',text:"Same honestly. I'm usually in bed by 12-1am. Sounds like we'd sync up pretty well.",time:'Mon 2:25 PM'},
+      {from:'them',text:"Do you have a preference on room selection? I'm flexible either way.",time:'Mon 4:10 PM'},
+    ]
+  },
+  {
+    id:2, name:'Priya Mehta', initials:'PM', color:'#9b7fce', colorDim:'#1e1530',
+    major:'Pre-Med Biology', year:'Sophomore', score:74, hometown:'Rochester, NY',
+    bio:'Studious but not antisocial! I keep my space organized and love cooking Indian food. I study a lot but I\'m not a hermit — I enjoy having people over occasionally.',
+    sleep:4, noise:2, guests:3, clean:9, study:9, social:4,
+    tags:['Early bird','Homebody','Study-focused','Quiet hours'],
+    contact:'priya.m@email.com', contacted:true, saved:false,
+    messages:[
+      {from:'them',text:"Hi Sal! Priya here. I saw we matched at 74% — pretty good!",time:'Tue 10:05 AM'},
+      {from:'me',text:"Hey Priya! Yeah I thought so too. What are you studying?",time:'Tue 10:30 AM'},
+      {from:'them',text:"Pre-med. It's a lot of studying haha. I need a quiet environment most evenings.",time:'Tue 10:33 AM'},
+      {from:'me',text:"That makes sense. I'm usually coding which is quiet too. I mostly use headphones.",time:'Tue 11:00 AM'},
+      {from:'them',text:"Perfect! I do have one cat, is that okay? She's very well-behaved.",time:'Tue 11:02 AM'},
+    ]
+  },
+  {
+    id:3, name:'Jordan Kim', initials:'JK', color:'#5b9bd5', colorDim:'#0f1f2a',
+    major:'Film & Media', year:'Senior', score:61, hometown:'NYC',
+    bio:'Creative type, film student. I keep weird hours sometimes for projects but I\'m considerate. Love having creative people around. Pretty flexible about most things.',
+    sleep:9, noise:6, guests:7, clean:5, study:5, social:8,
+    tags:['Creative','Night owl','Spontaneous','Social'],
+    contact:'jordan.k@email.com', contacted:false, saved:false,
+    messages:[]
+  },
+  {
+    id:4, name:'Aiden Chen', initials:'AC', color:'#e8c547', colorDim:'#2a2510',
+    major:'Computer Science', year:'Junior', score:58, hometown:'Syracuse, NY',
+    bio:'CS student like you! I game a lot in the evenings but I\'m quiet about it. My schedule is all over the place because of hackathons. Pretty low maintenance overall.',
+    sleep:8, noise:5, guests:2, clean:5, study:7, social:4,
+    tags:['CS major','Gamer','Hackathons','Flexible'],
+    contact:'aiden.c@email.com', contacted:false, saved:false,
+    messages:[]
+  }
+];
+
+const activities = [
+  {icon:'◈', text:'<b>Marcus Thompson</b> sent you a new message', time:'2h ago', type:'message'},
+  {icon:'◈', text:'You have a <b>87% match</b> with Marcus Thompson', time:'1d ago', type:'match'},
+  {icon:'✎', text:'Questionnaire Step 2 completed — <b>1 step remaining</b>', time:'2d ago', type:'questionnaire'},
+  {icon:'◈', text:'<b>Priya Mehta</b> matched with you — 74% compatibility', time:'3d ago', type:'match'},
+  {icon:'✉', text:'<b>Priya Mehta</b> replied to your message', time:'3d ago', type:'message'},
+  {icon:'◈', text:'<b>Jordan Kim</b> and <b>Aiden Chen</b> added to your candidates', time:'4d ago', type:'system'},
+];
+
+// ==================== STATE ====================
+let currentPage = 'dashboard';
+let currentConv = null;
+let qStep = 3;
+let qData = {
+  // step 1 (pre-filled)
+  bedtime: 6, wakeup: 5, lightSleeper: 'medium',
+  // step 2 (pre-filled)
+  guestFreq: 3, noiseTolerance: 4, studyEnv: 'quiet',
+  // step 3 (current)
+  cleanliness: 8, chores: 'rotate', smoking: 'no', pets: 'fine', bio: "Hey! I'm Sal, a junior CS student. I keep my space clean, respect quiet hours, and love connecting with cool people. Looking for someone chill and respectful."
+};
+let activeFilter = 'all';
+let reportTabIdx = 0;
+let modalPersonId = null;
+
+// ==================== NAVIGATION ====================
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.textContent.toLowerCase().includes(page==='matches'?'match':page==='questionnaire'?'question':page==='messages'?'message':page==='report'?'report':'dashboard')) n.classList.add('active');
+  });
+  currentPage = page;
+  if(page==='dashboard') renderDashboard();
+  if(page==='matches') renderMatches();
+  if(page==='questionnaire') renderQuestionnaire();
+  if(page==='messages') renderMessages();
+  if(page==='report') renderReport(reportTabIdx);
+}
+
+// Fix nav highlight
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const navItems = document.querySelectorAll('.nav-item');
+  const map = {dashboard:0,matches:1,questionnaire:2,messages:3,report:4};
+  if(map[page]!==undefined) navItems[map[page]].classList.add('active');
+  currentPage = page;
+  if(page==='dashboard') renderDashboard();
+  if(page==='matches') renderMatches();
+  if(page==='questionnaire') renderQuestionnaire();
+  if(page==='messages') renderMessages();
+  if(page==='report') renderReport(reportTabIdx);
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+  // Top matches preview
+  const el = document.getElementById('dash-matches-list');
+  el.innerHTML = candidates.slice(0,3).map(c=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="navigate('matches')">
+      <div style="width:36px;height:36px;border-radius:50%;background:${c.colorDim};color:${c.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">${c.initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${c.name}</div>
+        <div style="font-size:11px;color:var(--text3)">${c.major}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:15px;font-weight:600;color:var(--accent)">${c.score}%</div>
+        <div style="font-size:10px;color:var(--text3)">match</div>
+      </div>
+    </div>
+  `).join('')+'<div style="text-align:center;padding:12px 0"><button class="btn btn-ghost btn-sm" onclick="navigate(\'matches\')">See all 4 candidates →</button></div>';
+
+  // Activity feed
+  const af = document.getElementById('activity-feed');
+  af.innerHTML = activities.map(a=>`
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${a.icon}</div>
+      <div style="flex:1;font-size:13px;line-height:1.4">${a.text}</div>
+      <div style="font-size:11px;color:var(--text3);white-space:nowrap">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+// ==================== MATCHES ====================
+function renderMatches() {
+  let list = [...candidates].sort((a,b)=>b.score-a.score);
+  if(activeFilter==='high') list = list.filter(c=>c.score>=70);
+  if(activeFilter==='contacted') list = list.filter(c=>c.contacted);
+  if(activeFilter==='saved') list = list.filter(c=>c.saved);
+  const grid = document.getElementById('matches-grid');
+  grid.innerHTML = list.length ? list.map(c=>renderMatchCard(c)).join('') : '<div class="empty"><div class="empty-icon">◈</div><h3>No matches found</h3><p>Try a different filter</p></div>';
+}
+
+function renderMatchCard(c) {
+  const traits = [
+    {k:'Sleep',v:scoreLabel(c.sleep,'Early','Late')},
+    {k:'Noise level',v:scoreLabel(c.noise,'Silent','Loud')},
+    {k:'Guests',v:scoreLabel(c.guests,'Never','Often')},
+    {k:'Cleanliness',v:scoreLabel(c.clean,'Messy','Tidy')},
+  ];
+  return `<div class="match-card" id="mc-${c.id}">
+    <div class="match-header">
+      <div class="match-avatar" style="background:${c.colorDim};color:${c.color}">${c.initials}</div>
+      <div class="match-info">
+        <h3>${c.name}</h3>
+        <div class="match-major">${c.major} · ${c.year}</div>
+        <div class="match-major" style="margin-top:2px">📍 ${c.hometown}</div>
+      </div>
+      <div class="match-score">
+        <div class="score-ring" style="color:${c.score>=80?'var(--green)':c.score>=60?'var(--accent)':'var(--red)'}">${c.score}%</div>
+        <div class="score-label">match</div>
+      </div>
+    </div>
+    <div class="match-tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+      ${c.saved?'<span class="tag" style="background:var(--accent-dim);border-color:var(--accent);color:var(--accent)">★ Saved</span>':''}
+    </div>
+    <div class="match-traits">${traits.map(t=>`<div class="trait-row"><span class="trait-key">${t.k}</span><span class="trait-val">${t.v}</span></div>`).join('')}</div>
+    <div class="match-actions">
+      <button class="btn btn-primary btn-sm" onclick="openMessage(${c.id})">Message</button>
+      <button class="btn btn-ghost btn-sm" onclick="openProfile(${c.id})">View Profile</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleSave(${c.id},this)" style="margin-left:auto">${c.saved?'★ Saved':'☆ Save'}</button>
+    </div>
+  </div>`;
+}
+
+function scoreLabel(val, low, high) {
+  if(val<=3) return low;
+  if(val<=6) return 'Moderate';
+  return high;
+}
+
+function filterMatches(f) {
+  activeFilter = f;
+  document.querySelectorAll('[id^=filter-]').forEach(b=>{
+    b.className = b.id==='filter-'+f ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+  });
+  renderMatches();
+}
+
+function sortMatches(by) {
+  if(by==='name') candidates.sort((a,b)=>a.name.localeCompare(b.name));
+  else candidates.sort((a,b)=>b.score-a.score);
+  renderMatches();
+}
+
+function toggleSave(id, btn) {
+  const c = candidates.find(x=>x.id===id);
+  c.saved = !c.saved;
+  toast(c.saved ? `★ Saved ${c.name}`:`Removed ${c.name} from saved`,'info');
+  renderMatches();
+}
+
+function openMessage(id) {
+  navigate('messages');
+  setTimeout(()=>selectConv(id), 50);
+}
+
+function openProfile(id) {
+  const c = candidates.find(x=>x.id===id);
+  modalPersonId = id;
+  document.getElementById('modal-name').textContent = c.name;
+  document.getElementById('modal-bio').textContent = c.bio;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="insight-box"><div class="insight-title">Major</div><div class="insight-desc">${c.major}</div></div>
+      <div class="insight-box"><div class="insight-title">Year</div><div class="insight-desc">${c.year}</div></div>
+      <div class="insight-box"><div class="insight-title">Hometown</div><div class="insight-desc">${c.hometown}</div></div>
+      <div class="insight-box"><div class="insight-title">Match Score</div><div class="insight-desc" style="color:var(--accent)">${c.score}%</div></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+  `;
+  document.getElementById('profile-modal').classList.add('open');
+}
+
+function messageFromModal() {
+  document.getElementById('profile-modal').classList.remove('open');
+  openMessage(modalPersonId);
+}
+
+function viewProfile() {
+  if(currentConv) openProfile(currentConv);
+}
+
+function closeModal(e) {
+  if(e.target===document.getElementById('profile-modal')) document.getElementById('profile-modal').classList.remove('open');
+}
+
+// ==================== QUESTIONNAIRE ====================
+const qSteps = [
+  {
+    title:'Sleep & Routine',
+    fields:[
+      {type:'slider', key:'bedtime', label:'Typical Bedtime', hint:'When do you usually go to sleep?', min:1, max:10, minLabel:'9 PM – Early', maxLabel:'3 AM – Very late'},
+      {type:'slider', key:'wakeup', label:'Wake-up Time', hint:'What time do you usually wake up?', min:1, max:10, minLabel:'5 AM – Very early', maxLabel:'12 PM – Late'},
+      {type:'radio', key:'lightSleeper', label:'Sleep Sensitivity', hint:'How easily are you disturbed while sleeping?', options:[{val:'heavy',label:'Heavy sleeper — noise doesn\'t wake me'},{val:'medium',label:'Medium — somewhat sensitive to noise'},{val:'light',label:'Light sleeper — I wake up easily'}]},
+    ]
+  },
+  {
+    title:'Social & Environment',
+    fields:[
+      {type:'slider', key:'guestFreq', label:'Guest Frequency', hint:'How often would you have people over?', min:1, max:10, minLabel:'Never', maxLabel:'Almost daily'},
+      {type:'slider', key:'noiseTolerance', label:'Noise Tolerance', hint:'How comfortable are you with noise at home?', min:1, max:10, minLabel:'Silence only', maxLabel:'Always have music/TV'},
+      {type:'radio', key:'studyEnv', label:'Study Environment', hint:'Where do you prefer to study?', options:[{val:'room',label:'In my room — I need quiet space at home'},{val:'quiet',label:'Mix — sometimes home, sometimes library'},{val:'anywhere',label:'Anywhere — I can focus in any environment'}]},
+    ]
+  },
+  {
+    title:'Living Standards',
+    fields:[
+      {type:'slider', key:'cleanliness', label:'Cleanliness Standard', hint:'How clean do you keep shared spaces?', min:1, max:10, minLabel:'Pretty relaxed', maxLabel:'Spotless always'},
+      {type:'radio', key:'chores', label:'Chores Approach', hint:'How should household chores be handled?', options:[{val:'schedule',label:'Set schedule — assigned days/tasks'},{val:'rotate',label:'Rotating — take turns week to week'},{val:'asneeded',label:'As needed — whoever notices it, does it'}]},
+      {type:'chips', key:'smoking', label:'Smoking / Vaping', hint:'Select your preference', options:['No smoking','Smoking outside ok','Fine with smoking inside']},
+      {type:'chips', key:'pets', label:'Pets', hint:'Are you comfortable with pets?', options:['No pets','Cats ok','Dogs ok','Any pets fine']},
+      {type:'textarea', key:'bio', label:'About You', hint:'Write a short intro for potential roommates (2-3 sentences)'},
+    ]
+  }
+];
+
+function renderQuestionnaire() {
+  const step = qSteps[qStep-1];
+  const stepBar = document.getElementById('q-steps');
+  stepBar.innerHTML = [1,2,3].map(i=>`<div class="q-step ${i<qStep?'done':i===qStep?'active':''}"></div>`).join('');
+  document.getElementById('q-step-label').textContent = `Step ${qStep} of 3`;
+  document.getElementById('q-prev').style.display = qStep===1?'none':'';
+  document.getElementById('q-next').textContent = qStep===3?'Submit ✓':'Continue →';
+
+  document.getElementById('q-content').innerHTML = `
+    <div class="q-section">
+      <div class="q-section-title">${step.title}</div>
+      ${step.fields.map(f=>renderField(f)).join('')}
+    </div>
+  `;
+  // Bind sliders
+  step.fields.filter(f=>f.type==='slider').forEach(f=>{
+    const inp = document.getElementById('q-'+f.key);
+    const display = document.getElementById('qv-'+f.key);
+    if(inp&&display){
+      inp.value = qData[f.key];
+      display.textContent = qData[f.key];
+      inp.oninput = ()=>{qData[f.key]=parseInt(inp.value);display.textContent=inp.value;};
+    }
+  });
+}
+
+function renderField(f) {
+  if(f.type==='slider') return `
+    <div class="q-item">
+      <div class="q-label">${f.label}</div>
+      <div class="q-hint">${f.hint}</div>
+      <div class="q-slider-wrap">
+        <span class="q-slider-min">${f.minLabel}</span>
+        <input type="range" id="q-${f.key}" min="${f.min}" max="${f.max}" value="${qData[f.key]}" step="1"/>
+        <span class="q-val-display" id="qv-${f.key}">${qData[f.key]}</span>
+        <span class="q-slider-max">${f.maxLabel}</span>
+      </div>
+    </div>`;
+  if(f.type==='radio') return `
+    <div class="q-item">
+      <div class="q-label">${f.label}</div>
+      <div class="q-hint">${f.hint}</div>
+      <div class="q-radio-group">${f.options.map(o=>`
+        <div class="q-radio ${qData[f.key]===o.val?'selected':''}" onclick="selectRadio('${f.key}','${o.val}',this)">
+          <div class="q-radio-dot"></div>
+          <span class="q-radio-text">${o.label}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  if(f.type==='chips') return `
+    <div class="q-item">
+      <div class="q-label">${f.label}</div>
+      <div class="q-hint">${f.hint}</div>
+      <div class="q-select-grid">${f.options.map(o=>`
+        <div class="q-chip ${qData[f.key]===o?'selected':''}" onclick="selectChip('${f.key}','${o}',this)">${o}</div>`).join('')}
+      </div>
+    </div>`;
+  if(f.type==='textarea') return `
+    <div class="q-item">
+      <div class="q-label">${f.label}</div>
+      <div class="q-hint">${f.hint}</div>
+      <textarea class="q-textarea" id="q-${f.key}" oninput="qData['${f.key}']=this.value" placeholder="Write a brief intro…">${qData[f.key]||''}</textarea>
+    </div>`;
+  return '';
+}
+
+function selectRadio(key, val, el) {
+  qData[key] = val;
+  el.closest('.q-radio-group').querySelectorAll('.q-radio').forEach(r=>r.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('.q-radio-dot').style.background='var(--accent)';
+  el.querySelector('.q-radio-dot').style.borderColor='var(--accent)';
+}
+
+function selectChip(key, val, el) {
+  qData[key] = val;
+  el.closest('.q-select-grid').querySelectorAll('.q-chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function qNext() {
+  if(qStep<3){qStep++;renderQuestionnaire();}
+  else{
+    toast('Questionnaire submitted! Updating your matches…','info');
+    setTimeout(()=>toast('Matches recalculated — Marcus is still your top pick!','info'),1800);
+    navigate('dashboard');
+  }
+}
+function qPrev(){if(qStep>1){qStep--;renderQuestionnaire();}}
+
+// ==================== MESSAGES ====================
+function renderMessages() {
+  const listEl = document.getElementById('conv-list-items');
+  listEl.innerHTML = candidates.map(c=>{
+    const last = c.messages[c.messages.length-1];
+    const unread = c.contacted && c.messages.filter(m=>m.from==='them').length > 0 && (c.id===1||c.id===2);
+    return `<div class="conv-item ${currentConv===c.id?'active':''}" onclick="selectConv(${c.id})" data-name="${c.name.toLowerCase()}">
+      <div class="conv-item-header">
+        <span class="conv-name">${c.name}</span>
+        ${unread&&currentConv!==c.id?'<span class="conv-unread"></span>':''}
+        <span class="conv-time">${last?last.time:''}</span>
+      </div>
+      <div class="conv-preview">${last?last.text:'Start a conversation…'}</div>
+    </div>`;
+  }).join('');
+  if(currentConv) selectConv(currentConv);
+  document.getElementById('msg-badge').style.display='none';
+}
+
+function selectConv(id) {
+  currentConv = id;
+  const c = candidates.find(x=>x.id===id);
+  // Update list highlight
+  document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));
+  const items = document.querySelectorAll('.conv-item');
+  candidates.forEach((cc,i)=>{if(cc.id===id)items[i].classList.add('active');});
+  // Header
+  document.getElementById('chat-hdr-avatar').textContent = c.initials;
+  document.getElementById('chat-hdr-avatar').style.background = c.colorDim;
+  document.getElementById('chat-hdr-avatar').style.color = c.color;
+  document.getElementById('chat-hdr-name').textContent = c.name;
+  document.getElementById('chat-hdr-status').textContent = c.contacted?'● Online · '+c.score+'% match':'';
+  document.getElementById('view-profile-btn').style.display='';
+  document.getElementById('chat-input-area').style.display='';
+  renderChatMsgs(c);
+  if(!c.contacted) c.contacted = true;
+}
+
+function renderChatMsgs(c) {
+  const el = document.getElementById('chat-msgs');
+  if(!c.messages.length){
+    el.innerHTML = `<div class="empty"><div class="empty-icon">✉</div><h3>No messages yet</h3><p>Say hello to ${c.name.split(' ')[0]}!</p></div>`;
+    return;
+  }
+  el.innerHTML = c.messages.map(m=>`
+    <div class="msg ${m.from==='me'?'me':'them'}">
+      <div class="msg-bubble">${m.text}</div>
+      <div class="msg-time">${m.time}</div>
+    </div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function sendMessage() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if(!text||!currentConv) return;
+  const c = candidates.find(x=>x.id===currentConv);
+  const now = new Date();
+  const time = 'Today '+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  c.messages.push({from:'me',text,time});
+  inp.value='';
+  renderChatMsgs(c);
+  renderMessages();
+  // Auto-reply after 1-2s
+  const replies = {
+    1:["That makes sense!", "Yeah for sure, sounds good.", "Haha same. We should definitely meet up and talk more.","Cool! Let's plan to meet once housing opens up."],
+    2:["Oh that's good to hear!", "Makes sense. I appreciate that.", "That works for me!","Sounds like a good fit honestly."],
+    3:["Cool cool, I'll keep that in mind.","Gotcha, thanks for letting me know.","Nice! I'm pretty flexible about most things too."],
+    4:["Oh nice, CS is a great major!", "Haha yeah hackathons are crazy but fun.","Yeah that works for me.","Makes sense!"]
+  };
+  const pool = replies[currentConv]||["Sounds good!","Cool!","Got it, thanks."];
+  setTimeout(()=>{
+    const reply = pool[Math.floor(Math.random()*pool.length)];
+    c.messages.push({from:'them',text:reply,time:'Just now'});
+    renderChatMsgs(c);
+    renderMessages();
+  }, 1200+Math.random()*800);
+}
+
+function handleEnter(e) {
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+}
+
+function searchConvs(q) {
+  document.querySelectorAll('.conv-item').forEach(el=>{
+    el.style.display = el.dataset.name.includes(q.toLowerCase())?'':'none';
+  });
+}
+
+// ==================== REPORT ====================
+function renderReport(idx) {
+  reportTabIdx = idx;
+  const c = candidates[idx];
+  const categories = [
+    {label:'Sleep Schedule', sal:sal.sleep, them:c.sleep},
+    {label:'Noise Level', sal:sal.noise, them:c.noise},
+    {label:'Guest Frequency', sal:sal.guests, them:c.guests},
+    {label:'Cleanliness', sal:sal.clean, them:c.clean},
+    {label:'Study Habits', sal:sal.study, them:c.study},
+    {label:'Social Battery', sal:sal.social, them:c.social},
+  ];
+  const catScores = categories.map(cat=>{
+    const diff = Math.abs(cat.sal-cat.them);
+    const score = Math.round((1-diff/9)*100);
+    return {...cat, score};
+  });
+  const avg = Math.round(catScores.reduce((s,x)=>s+x.score,0)/catScores.length);
+
+  const insights = generateInsights(c, catScores);
+  const circumference = 2*Math.PI*46;
+  const dashOffset = circumference*(1-avg/100);
+
+  document.getElementById('report-content').innerHTML = `
+    <div class="grid2" style="gap:20px">
+      <div class="card">
+        <div class="report-header">
+          <div>
+            <h2 style="font-size:18px;font-weight:500;margin-bottom:4px">${c.name}</h2>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:12px">${c.major} · ${c.year} · ${c.hometown}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          </div>
+          <div class="compat-ring">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="46" fill="none" stroke="var(--surface3)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="46" fill="none" stroke="${avg>=80?'var(--green)':avg>=60?'var(--accent)':'var(--red)'}" stroke-width="8" stroke-dasharray="${circumference.toFixed(1)}" stroke-dashoffset="${dashOffset.toFixed(1)}" stroke-linecap="round"/>
+            </svg>
+            <div class="compat-ring-text">
+              <div class="compat-ring-num" style="color:${avg>=80?'var(--green)':avg>=60?'var(--accent)':'var(--red)'}">${avg}%</div>
+              <div class="compat-ring-lbl">match</div>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="report-section">
+          <div class="report-section-title">Category Breakdown</div>
+          ${catScores.map(cat=>`
+            <div class="compat-row">
+              <span class="compat-row-label">${cat.label}</span>
+              <div class="compat-row-bar">
+                <div class="prog-wrap"><div class="prog-fill ${cat.score>=80?'green':cat.score>=60?'':'blue'}" style="width:${cat.score}%;background:${cat.score>=80?'var(--green)':cat.score>=60?'var(--accent)':'var(--blue)'}"></div></div>
+              </div>
+              <span class="compat-row-score">${cat.score}%</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="report-section-title">Compatibility Insights</div>
+          ${insights.map(i=>`<div class="insight-box ${i.type}"><div class="insight-title">${i.title}</div><div class="insight-desc">${i.desc}</div></div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="report-section-title">Recommendation</div>
+          <p style="font-size:14px;line-height:1.6;color:var(--text2);margin-bottom:14px">${generateReco(c, avg)}</p>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="openMessage(${c.id})">Message ${c.name.split(' ')[0]}</button>
+            <button class="btn btn-ghost btn-sm" onclick="openProfile(${c.id})">Full Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function generateInsights(c, catScores) {
+  const insights = [];
+  catScores.forEach(cat=>{
+    if(cat.score>=85) insights.push({type:'good',title:`Strong match: ${cat.label}`,desc:`You and ${c.name.split(' ')[0]} are highly compatible on ${cat.label.toLowerCase()}. This reduces a major potential friction point.`});
+    else if(cat.score<=45) insights.push({type:'bad',title:`Potential friction: ${cat.label}`,desc:`There's a notable gap in ${cat.label.toLowerCase()}. This is worth discussing openly before committing.`});
+    else if(cat.score<=65) insights.push({type:'warn',title:`Moderate difference: ${cat.label}`,desc:`You have some differences in ${cat.label.toLowerCase()}. A conversation could help align expectations.`});
+  });
+  return insights.slice(0,4);
+}
+
+function generateReco(c, avg) {
+  if(avg>=80) return `${c.name} is a strong match for you, Sal. Your lifestyles align well across most key dimensions. We recommend reaching out and scheduling a meet-up to confirm compatibility in person.`;
+  if(avg>=65) return `${c.name} is a solid potential match. There are a few areas of difference but nothing that can't be worked out with a good conversation. Consider messaging them to discuss your respective expectations.`;
+  return `${c.name} is a potential match but there are some meaningful lifestyle differences. Review the areas flagged above and consider whether you'd both be willing to compromise before moving forward.`;
+}
+
+function selectReportTab(idx, el) {
+  reportTabIdx = idx;
+  document.querySelectorAll('.report-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderReport(idx);
+}
+
+// ==================== TOAST ====================
+function toast(msg, type='') {
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast'+(type?' '+type:'');
+  t.innerHTML = (type==='info'?'ℹ ':'✓ ')+msg;
+  wrap.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+
+// ==================== INIT ====================
+renderDashboard();
+</script>
+</body>
+</html>
